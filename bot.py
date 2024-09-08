@@ -65,7 +65,7 @@ async def create_channel(ctx, channel_name = 'new-channel', channel_category = N
         await ctx.send(f"Channel with name \"**{channel_name}**\" successfully created. Warning: a channel with this name already exists.")
     
 @create_channel.error
-async def give_role_error(ctx, error):
+async def create_channel_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have the permissions necessary to use this command.")
     else:
