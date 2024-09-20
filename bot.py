@@ -12,66 +12,8 @@ bot = commands.Bot(intents=discord.Intents.all(), command_prefix='-')
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
+    await bot.load_extension("channel")
+    await bot.load_extension("role")
     await bot.load_extension("roll")
-
-@bot.command(name='give-role')
-@commands.has_permissions(administrator=True)
-async def give_role(ctx, user: commands.MemberConverter, role: commands.RoleConverter):
-    if role.position >= ctx.guild.me.top_role.position:
-            await ctx.send("I do not have the permissions to grant that role.")
-            return
-    await user.add_roles(role)
-    await ctx.send(f"{role.name} has been granted to {user.mention}")
-
-@give_role.error
-async def give_role_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have the permissions necessary to use this command.")
-    else:
-        await ctx.send("Error! Make sure you're specifying the user and the role you want to grant to them!")
-    
-@bot.command(name='create-channel')
-@commands.has_permissions(administrator=True)
-async def create_channel(ctx, channel_name = 'new-channel', channel_category = None):
-    if channel_category:
-        channel_category = channel_category.title()
-    temp_channel_category = channel_category # store name of channel_category in case it is overwritten later
-    existing_channel = discord.utils.get(ctx.guild.channels, name=channel_name)
-    overwrites = {
-        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        ctx.guild.me: discord.PermissionOverwrite(read_messages=True) # type: ignore
-    }
-    if channel_category:
-        channel_category = discord.utils.get(ctx.guild.categories, name=channel_category)
-        if not channel_category:
-            await ctx.send(f"The category \"**{temp_channel_category}**\" does not exist! If the category is multiple words, use quotation marks to denote it!")
-            return  
-    await ctx.guild.create_text_channel(channel_name, overwrites=overwrites, category=channel_category)
-    if not existing_channel:
-        await ctx.send(f"Channel with name \"**{channel_name}**\" successfully created.")
-    else:
-        await ctx.send(f"Channel with name \"**{channel_name}**\" successfully created. Warning: a channel with this name already exists.")
-    
-@create_channel.error
-async def create_channel_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have the permissions necessary to use this command.")
-    else:
-        await ctx.send("An error has occurred!")
-
-@bot.command(name='num-channels')
-@commands.has_permissions(administrator=True)
-async def num_channels(ctx):
-    await ctx.send(f"{len(ctx.guild.text_channels)} text channels")
-    await ctx.send(f"{len(ctx.guild.voice_channels)} voice channels")
-    await ctx.send(f"{len(ctx.guild.channels)} channels including categories")
-
-@num_channels.error
-async def num_channels_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You do not have the permissions necessary to use this command.")
-    else:
-        await ctx.send("An error has occurred!")  
-
 
 bot.run(TOKEN)
