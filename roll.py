@@ -1,3 +1,5 @@
+# Contains code for the dice command(s), which allow users to roll dice
+
 import discord
 import random
 from discord.ext import commands
@@ -6,6 +8,7 @@ class Roll(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    # Roll x dice, each with y sides
     @commands.command(name='roll')
     async def roll(self, ctx, num_dice: int, num_sides: int):
         response = 0

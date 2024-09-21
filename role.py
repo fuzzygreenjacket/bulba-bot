@@ -1,3 +1,5 @@
+# Contains code for the role command(s), which allow users to manipulate roles
+
 import discord
 from discord.ext import commands
 
@@ -5,6 +7,7 @@ class Role(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
+    # give a role to a user (admin only)
     @commands.command(name='give-role')
     @commands.has_permissions(administrator=True)
     async def give_role(self, ctx, user: commands.MemberConverter, role: commands.RoleConverter):

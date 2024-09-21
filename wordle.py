@@ -1,7 +1,10 @@
+# Contains code for the Wordle command(s), which allow users to play a game of Wordle
+
 import discord
 import random
 from discord.ext import commands
 
+# dictionary mapping letters to their respective discord emojis
 letter_to_emoji = {
     'a': ':regional_indicator_a:', 'b': ':regional_indicator_b:', 
     'c': ':regional_indicator_c:', 'd': ':regional_indicator_d:',
@@ -51,7 +54,7 @@ class Wordle(commands.Cog):
         if ctx.channel.id in self.active_games:  # Check if a game is already active in this channel
             await ctx.send("Game already in progress in this channel! Send `[cancel]` to reset.")
             return
-        self.active_games[ctx.channel.id] = True  # Set the game as active
+        self.active_games[ctx.channel.id] = True  # Set the game as active—only one game should be active per channel
 
         with open('wordle_files/wordle-La.txt') as f:
             lines = f.read().splitlines()
@@ -75,52 +78,52 @@ class Wordle(commands.Cog):
                     await ctx.send(f"Game cancelled! The word was {word}.")
                     del self.active_games[ctx.channel.id]
                     return
-                if len(msg.content) < 2 or msg.content[0] != '[' or msg.content[-1] != "]":      # message is not a guess
+                if len(msg.content) < 2 or msg.content[0] != '[' or msg.content[-1] != "]":     # message is not a guess
                     pass
                 elif len(msg.content[1:-1]) != 5:     # guess is wrong length
                     await ctx.send("Your guess must be five letters long!")
-                elif not self.valid_word(msg.content[1:-1].lower()):
+                elif not self.valid_word(msg.content[1:-1].lower()):    # guess is not a valid word
                     await ctx.send("That is not a valid word. Try again!")
-                else:
+                else:       # guess is valid guess, so we proceed
                     total_guesses += 1
-                    guess = msg.content[1:-1].lower()
+                    guess = msg.content[1:-1].lower()       # strip the word from the brackets
                     squares = ["X", "X", "X", "X", "X"]
                     word_letter_instances = {}      # hash map of each letter in word and how often they show up
                     guess_letter_instances = {}     # hash map of each letter in guess and how often they show up
                     for i in range(5):
-                        self.update_tracker(word[i], word_letter_instances)
+                        self.update_tracker(word[i], word_letter_instances)     # update word_letter_instances with each letter and how many times it appears
                     print(word_letter_instances)
-                    for i in range(5):
+                    for i in range(5):      # first, go through and check for correct letters in the correct position
                         if guess[i] == word[i]:
                             squares[i] = "🟩"
-                            self.update_tracker(guess[i], guess_letter_instances)
-                    for i in range(5):
-                        if guess[i] != word[i] and guess[i] in word:
-                            self.update_tracker(guess[i], guess_letter_instances)
-                            print(guess_letter_instances)
-                            if guess_letter_instances[guess[i]] <= word_letter_instances[guess[i]]:
+                            self.update_tracker(guess[i], guess_letter_instances)       # for any correct letters, correct positions you find, update guess_letter_instances with how many times that letter has appeared
+                    for i in range(5):      # next, go through and check for correct letters in the wrong position
+                        if guess[i] != word[i] and guess[i] in word:    # letter should be in the word but NOT in the correct spot
+                            self.update_tracker(guess[i], guess_letter_instances)       # # for any correct letters, incorrect positions you find, update guess_letter_instsances with how many times that letter has appeared
+                            print(guess_letter_instances)       # for debugging
+                            if guess_letter_instances[guess[i]] <= word_letter_instances[guess[i]]:     # need to make sure you are not double counting letters if there's only one in the actual word; use the hashmaps for this
                                 squares[i] = "🟨"
-                    print(squares)
-                    print(guess_letter_instances)
-                    for i in range(5):
+                    print(squares)      # for debugging
+                    print(guess_letter_instances)   # for debugging
+                    for i in range(5):      # fill in the incorrect letters with black squares 
                         if squares[i] == "X":
                             squares[i] = "⬛"
                     result = ''.join(squares)
                     emoji_guess = ""
-                    for i in range(5):
+                    for i in range(5):      # convert the guess to emojis
                         emoji_guess += letter_to_emoji[guess[i]]
-                    self.remove_letters(unguessed_letters, guess)
+                    self.remove_letters(unguessed_letters, guess)   # update list of unguessed letters
                     unguessed_letters_str = ""
-                    for letter in unguessed_letters:
+                    for letter in unguessed_letters:    # list the unguessed letters as emojis
                         unguessed_letters_str += letter_to_emoji[letter]
-                    if result == "🟩🟩🟩🟩🟩":
+                    if result == "🟩🟩🟩🟩🟩":      # guess was correct
                         await ctx.send(f"{result}")
                         await ctx.send(f"{emoji_guess}")
                         await ctx.send(f"Unguessed Letters: {unguessed_letters_str}")
                         await ctx.send(f"Congrats! You correctly guessed the word in {total_guesses} guesses")
                         del self.active_games[ctx.channel.id]
                         return
-                    else:
+                    else:       # guess was incorrect
                         await ctx.send(f"{result}")
                         await ctx.send(f"{emoji_guess}")
                         await ctx.send(f"Unguessed Letters: {unguessed_letters_str}")

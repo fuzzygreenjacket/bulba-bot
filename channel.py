@@ -1,3 +1,5 @@
+# Contains code for the channel command(s), which allow users to manipulate channels
+
 import discord
 from discord.ext import commands
 
@@ -5,11 +7,13 @@ class Channel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         
+    # Create a channel. You can optionally specify the name of the channel and the category it should be under.
+    # Permissions are set to private
     @commands.command(name='create-channel')
     @commands.has_permissions(administrator=True)
     async def create_channel(self, ctx, channel_name = 'new-channel', channel_category = None):
         if channel_category:
-            channel_category = channel_category.title()
+            channel_category = channel_category.title()     # set channel category to title case
         temp_channel_category = channel_category # store name of channel_category in case it is overwritten later
         existing_channel = discord.utils.get(ctx.guild.channels, name=channel_name)
         overwrites = {
@@ -18,7 +22,7 @@ class Channel(commands.Cog):
         }
         if channel_category:
             channel_category = discord.utils.get(ctx.guild.categories, name=channel_category)
-            if not channel_category:
+            if not channel_category:    # make sure the name of the channel_category actually exists
                 await ctx.send(f"The category \"**{temp_channel_category}**\" does not exist! If the category is multiple words, use quotation marks to denote it!")
                 return  
         await ctx.guild.create_text_channel(channel_name, overwrites=overwrites, category=channel_category)
@@ -34,6 +38,7 @@ class Channel(commands.Cog):
         else:
             await ctx.send("An error has occurred!")
 
+    # Get the number of channels in a server
     @commands.command(name='num-channels')
     @commands.has_permissions(administrator=True)
     async def num_channels(self, ctx):
