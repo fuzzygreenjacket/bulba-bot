@@ -20,9 +20,9 @@ Wordle Commands
 
 ## Admin-Only Commands
 The following commands are admin-only:  
-```-create-channel```
-```-give-role```
-```-remove-role```
+```-create-channel```  
+```-give-role```  
+```-remove-role```  
 
 Credits:  
 [RealPython](https://realpython.com/how-to-make-a-discord-bot-python/) for the skeleton code and setup instructions  
