@@ -4,7 +4,7 @@ Bulba Bot is a discord bot developed by Matt (Discord Username Bulbasaur2023) fo
 
 ## Current Commands
 
-Channel Commands:
+Channel Commands:  
 ```-create-channel [NAME] [CATEGORY]```: Create a channel. You have the option to specify the channel name and channel category respectively, using quotes to separate them. Channels created with this command are defaulted to private.  
 ```-num-channels```: Retrieve the total number of channels in the server  
 
