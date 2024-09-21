@@ -40,6 +40,12 @@ class Wordle(commands.Cog):
         else:
             tracker[letter] += 1
     
+    # given a list of letters, remove all letters that are in a certain word
+    def remove_letters(self, letters, word):
+        for letter in word:
+            if letter in letters:
+                letters.remove(letter)
+    
     @commands.command(name='wordle')
     async def wordle(self, ctx):
         if ctx.channel.id in self.active_games:  # Check if a game is already active in this channel
@@ -51,6 +57,12 @@ class Wordle(commands.Cog):
             lines = f.read().splitlines()
         word = random.choice(lines)     # choose random word from database
         total_guesses = 0
+        unguessed_letters = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 
+            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 
+            'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
+            'y', 'z'
+        ]
         await ctx.send("Word selected! Send your guess enclosed in brackets and with no dash at the start, e.g. `[apple]`. Do `[cancel]` to end the game.")
         while True:
             def check(msg):
@@ -95,15 +107,21 @@ class Wordle(commands.Cog):
                     emoji_guess = ""
                     for i in range(5):
                         emoji_guess += letter_to_emoji[guess[i]]
+                    self.remove_letters(unguessed_letters, guess)
+                    unguessed_letters_str = ""
+                    for letter in unguessed_letters:
+                        unguessed_letters_str += letter_to_emoji[letter]
                     if result == "🟩🟩🟩🟩🟩":
                         await ctx.send(f"{result}")
                         await ctx.send(f"{emoji_guess}")
+                        await ctx.send(f"Unguessed Letters: {unguessed_letters_str}")
                         await ctx.send(f"Congrats! You correctly guessed the word in {total_guesses} guesses")
                         del self.active_games[ctx.channel.id]
                         return
                     else:
                         await ctx.send(f"{result}")
                         await ctx.send(f"{emoji_guess}")
+                        await ctx.send(f"Unguessed Letters: {unguessed_letters_str}")
                         await ctx.send(f"That was guess number {total_guesses}")
                         if total_guesses == 6:
                             await ctx.send(f"All guesses used! The word was {word}")
