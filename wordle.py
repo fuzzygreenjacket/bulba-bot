@@ -136,6 +136,11 @@ class Wordle(commands.Cog):
                 await ctx.send("You took too long to respond!")
                 del self.active_games[ctx.channel.id]
                 return
+    
+    @wordle.error
+    async def wordle_error(self, ctx, error):
+        await ctx.send("An error has occurred!")
+
 
 async def setup(bot):
     await bot.add_cog(Wordle(bot))
