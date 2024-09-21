@@ -13,9 +13,16 @@ Dice Roll Commands:
 
 Role Commands:  
 ```-give-role [USER] [ROLE]```: Give a role to a user. You must specify the user and the role in that order.  
+```-remove-role [USER] [ROLE]```: Remove a role from a user. You must specify the user and the role in that order. 
 
 Wordle Commands  
 ```-wordle```: Begin a game of wordle. Words are guessed by enclosing them in brackets, like ```[apple]```.  
+
+## Admin-Only Commands
+The following commands are admin-only:  
+```-create-channel```
+```-give-role```
+```-remove-role```
 
 Credits:  
 [RealPython](https://realpython.com/how-to-make-a-discord-bot-python/) for the skeleton code and setup instructions  
