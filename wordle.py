@@ -49,7 +49,7 @@ class Wordle(commands.Cog):
     @commands.command(name='wordle')
     async def wordle(self, ctx):
         if ctx.channel.id in self.active_games:  # Check if a game is already active in this channel
-            await ctx.send("Game already in progress in this channel!")
+            await ctx.send("Game already in progress in this channel! Send `[cancel]` to reset.")
             return
         self.active_games[ctx.channel.id] = True  # Set the game as active
 
@@ -63,12 +63,14 @@ class Wordle(commands.Cog):
             'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 
             'y', 'z'
         ]
+
         await ctx.send("Word selected! Send your guess enclosed in brackets and with no dash at the start, e.g. `[apple]`. Do `[cancel]` to end the game.")
+        
         while True:
             def check(msg):
                 return msg.channel == ctx.channel   # make sure message is sent in the same channel
             try:
-                msg = await self.bot.wait_for("message", check=check, timeout = 300)
+                msg = await self.bot.wait_for("message", check=check, timeout = 120)
                 if msg.content.lower() == "[cancel]":    # game is canceled
                     await ctx.send(f"Game cancelled! The word was {word}.")
                     del self.active_games[ctx.channel.id]
